@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales & Inventory Management System</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/inventory.css">
+    <link rel="stylesheet" href="styles/billing.css">
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-store"></i>
+                <h1>Sales & Inventory Manager</h1>
+            </div>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-section="inventory">
+                    <i class="fas fa-boxes"></i>
+                    Inventory
+                </button>
+                <button class="nav-tab" data-section="billing">
+                    <i class="fas fa-cash-register"></i>
+                    Billing
+                </button>
+                <button class="nav-tab" data-section="dashboard">
+                    <i class="fas fa-chart-bar"></i>
+                    Dashboard
+                </button>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Inventory Management Section -->
+            <section id="inventory" class="section active">
+                <div class="section-header">
+                    <h2><i class="fas fa-boxes"></i> Inventory Management</h2>
+                    <button class="btn btn-primary" id="add-item-btn">
+                        <i class="fas fa-plus"></i> Add New Item
+                    </button>
+                </div>
+
+                <!-- Add Item Form -->
+                <div class="form-container" id="add-item-form" style="display: none;">
+                    <h3>Add New Item</h3>
+                    <form id="item-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="item-name">Item Name*</label>
+                                <input type="text" id="item-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="item-category">Category</label>
+                                <input type="text" id="item-category" placeholder="e.g., Electronics, Clothing">
+                            </div>
+                            <div class="form-group">
+                                <label for="item-quantity">Quantity*</label>
+                                <input type="number" id="item-quantity" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="item-cost">Cost Price*</label>
+                                <input type="number" id="item-cost" step="0.01" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="item-price">Sales Price (Inc. GST)*</label>
+                                <input type="number" id="item-price" step="0.01" min="0" required>
+                                <small style="color: #6c757d; font-style: italic; margin-top: 0.5rem; display: block;">
+                                    Enter the final selling price including 18% GST. The system will automatically calculate the GST component.
+                                </small>
+                            </div>
+                            <div class="form-group">
+                                <label for="item-description">Description</label>
+                                <textarea id="item-description" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="item-image">Item Image</label>
+                            <input type="file" id="item-image" accept="image/*">
+                            <div class="image-preview" id="image-preview"></div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save"></i> Save Item
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="cancel-add">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Items List -->
+                <div class="items-container">
+                    <div class="items-header">
+                        <div class="search-container">
+                            <input type="text" id="search-items" placeholder="Search items...">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="filter-container">
+                            <select id="category-filter">
+                                <option value="">All Categories</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="items-grid" id="items-grid">
+                        <!-- Items will be populated here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Billing Section -->
+            <section id="billing" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-cash-register"></i> Billing System</h2>
+                    <button class="btn btn-primary" id="new-sale-btn">
+                        <i class="fas fa-plus"></i> New Sale
+                    </button>
+                </div>
+
+                <div class="billing-container">
+                    <!-- Customer Details -->
+                    <div class="customer-form">
+                        <h3>Customer Details</h3>
+                        <form id="customer-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="customer-name">Customer Name*</label>
+                                    <input type="text" id="customer-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="customer-phone">Phone Number*</label>
+                                    <input type="tel" id="customer-phone" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="customer-reg">Registration Number</label>
+                                    <input type="text" id="customer-reg">
+                                </div>
+                                <div class="form-group">
+                                    <label for="payment-mode">Payment Mode*</label>
+                                    <select id="payment-mode" required>
+                                        <option value="">Select Payment Mode</option>
+                                        <option value="cash">Cash</option>
+                                        <option value="upi">UPI</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Item Selection -->
+                    <div class="item-selection">
+                        <h3>Select Items</h3>
+                        <div class="item-search">
+                            <input type="text" id="billing-search" placeholder="Search items to add...">
+                            <div class="search-results" id="search-results"></div>
+                        </div>
+                    </div>
+
+                    <!-- Cart -->
+                    <div class="cart-container">
+                        <h3>Cart</h3>
+                        <div class="cart-items" id="cart-items">
+                            <p class="empty-cart">No items in cart</p>
+                        </div>
+                        <div class="cart-summary">
+                            <div class="summary-row">
+                                <span>Subtotal (Pre-GST):</span>
+                                <span id="subtotal">₹0.00</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Tax (GST 18%):</span>
+                                <span id="tax-amount">₹0.00</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>Total (GST Inclusive):</span>
+                                <span id="total-amount">₹0.00</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-success btn-full" id="generate-bill-btn" disabled>
+                            <i class="fas fa-receipt"></i> Generate Bill
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bill Modal -->
+                <div class="modal" id="bill-modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Invoice</h3>
+                            <button class="close-btn" id="close-bill">&times;</button>
+                        </div>
+                        <div class="bill-content" id="bill-content">
+                            <!-- Bill will be generated here -->
+                        </div>
+                        <div class="modal-actions">
+                            <button class="btn btn-primary" id="print-bill">
+                                <i class="fas fa-print"></i> Print
+                            </button>
+                            <button class="btn btn-success" id="save-sale">
+                                <i class="fas fa-save"></i> Save Sale
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-bar"></i> Sales Dashboard</h2>
+                    <div class="dashboard-controls">
+                        <div class="date-filter">
+                            <select id="period-filter">
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                                <option value="year">This Year</option>
+                            </select>
+                        </div>
+                        <div class="export-buttons">
+                            <button class="btn btn-success" id="export-excel-btn">
+                                <i class="fas fa-file-excel"></i> Export to Excel
+                            </button>
+                            <button class="btn btn-primary" id="export-detailed-btn">
+                                <i class="fas fa-chart-line"></i> Detailed Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-sales">₹0</h3>
+                            <p>Total Sales</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-profit">₹0</h3>
+                            <p>Total Profit</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-orders">0</h3>
+                            <p>Total Orders</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-items">0</h3>
+                            <p>Items in Stock</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-charts">
+                    <div class="chart-container">
+                        <h3>Sales Overview</h3>
+                        <canvas id="sales-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Top Selling Items</h3>
+                        <canvas id="items-chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="recent-sales">
+                    <h3>Recent Sales</h3>
+                    <div class="sales-table" id="sales-table">
+                        <!-- Recent sales will be populated here -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/inventory.js"></script>
+    <script src="js/billing.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html> 
