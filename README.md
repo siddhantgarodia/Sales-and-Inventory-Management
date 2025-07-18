@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Sales & Inventory Management System
 
 A comprehensive web-based sales and inventory management solution built with HTML, CSS, and JavaScript. Features real-time inventory tracking, point-of-sale billing, and detailed analytics dashboard.
@@ -245,3 +246,6 @@ For questions or issues:
 ---
 
 **Happy Selling! 🛍️**
+=======
+# Sales-and-Inventory-Management
+>>>>>>> 3159c55b8c4eda8345f0756b1259615bf10512b7
